@@ -87,9 +87,13 @@ router.get("/delete", async (req, res) => {
                 id: id
             }
         });
-        result.is_deleted = true;
-        await result.save();
-        return res.sendStatus(200);
+        if (result) {
+            result.is_deleted = true;
+            await result.save();
+            return res.sendStatus(200);
+        } else {
+            return res.sendStatus(404);
+        }
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);
