@@ -8,21 +8,22 @@ router.get("/list", async (req, res) => {
     let $query = {};
     if (name != undefined) {
         $query = {
-            TRUCK_CAT_NAME: {
+            name: {
                 [Op.like]: `%${name}%`
             }
         }
     }
 
-    const totalCount = await TruckCatModel.findAll({
+    let totalCount = await TruckCatModel.count({
         where: $query,
-        attributes: [["TRUCK_CAT_ID", "id"], ["TRUCK_CAT_NAME", "name"]]
+        attributes: ["id", "name"]
     });
 
     let results = await TruckCatModel.findAll({
         where: $query,
-        attributes: [["TRUCK_CAT_ID", "id"], ["TRUCK_CAT_NAME", "name"]]
+        attributes: ["id", "name"]
     });
+
     return res.send({
         totalCount,
         results
@@ -32,11 +33,11 @@ router.get("/list", async (req, res) => {
 router.get("/detail", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await DriverModel.findOne({
+        let result = await TruckCatModel.findOne({
             where: {
-                TRUCK_CAT_ID: id
+                id: id
             },
-            attributes: [["TRUCK_CAT_ID", "id"], ["TRUCK_CAT_NAME", "name"]]
+            attributes: ["id", "name"]
         });
         return res.send(result);
     } catch (e) {
@@ -48,8 +49,8 @@ router.get("/detail", async (req, res) => {
 router.post("/add", async (req, res) => {
     let { name } = req.body;
     try {
-        let result = await DriverModel.create({
-            TRUCK_CAT_NAME: name,
+        let result = await TruckCatModel.create({
+            name: name,
         });
         return res.sendStatus(200);
     } catch (e) {
@@ -62,13 +63,13 @@ router.post("/update", async (req, res) => {
     let { id } = req.query;
     let { name } = req.body;
     try {
-        let result = await Driver.findOne({
+        let result = await TruckCatModel.findOne({
             where: {
-                TRUCK_CAT_ID: id
+                id: id
             }
         });
         if (name !== undefined) {
-            result.TRUCK_CAT_NAME = name;
+            result.name = name;
         }
         await result.save();
         return res.sendStatus(200);
@@ -81,11 +82,13 @@ router.post("/update", async (req, res) => {
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await Driver.destroy({
+        let result = await TruckCatModel.findOne({
             where: {
-                TRUCK_CAT_ID: id
+                id: id
             }
         });
+        result.is_deleted = true;
+        await result.save();
         return res.sendStatus(200);
     } catch (e) {
         console.log(e);

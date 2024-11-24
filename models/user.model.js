@@ -76,7 +76,7 @@ module.exports = {
      * @returns
      */
     insertUserData: async (UserModel) => {
-        const UserData = [
+        const userData = [
             {
                 id: 1,
                 username: "admin",
@@ -92,7 +92,7 @@ module.exports = {
                 password: "123456"
             },
         ];
-        await UserModel.bulkCreate(TruckCatData, { updateOnDuplicate: ['id'] });
+        await UserModel.bulkCreate(userData, { updateOnDuplicate: ['id'] });
         console.log("Insert user success");
     }
 }

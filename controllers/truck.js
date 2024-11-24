@@ -4,53 +4,45 @@ const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    return res.send({
-        totalCount: 2,
-        results: [{
-            id: 1,
-            name: "xe 1",
-            licensePlate: "14uuuuuu",
-            catId: 1,
-            status: 1,
-        },
-        {
-            id: 2,
-            name: "xe 1",
-            licensePlate: "15uuuuuu",
-            catId: 3,
-            status: 2,
-        },]
-    });
-    const { name, licensePlate, catId, status } = req.query;
-    let $query = {};
+    const { name, license_plate, cat_id, status } = req.query;
+    let $query = {
+        is_deleted :false
+    };
     if (name) {
-        $query.TRUCK_NAME = {
+        $query.name = {
             [Op.like]: `%${name}%`
         }
     }
-    if (licensePlate) {
-        $query.TRUCK_LICENSE_PLATE = {
-            [Op.like]: `%${licensePlate}%`
+    if (license_plate) {
+        $query.license_plate = {
+            [Op.like]: `%${license_plate}%`
         }
     }
-    if (catId) {
-        $query.TRUCK_CAT_ID = catId;
+    if (cat_id) {
+        $query.cat_id = cat_id;
     }
     if (status) {
-        $query.TRUCK_STATUS = status;
+        $query.status = status;
     }
-    let result = await Truck.findAll({
+    let totalCount = await TruckModel.count({
+        where: $query,
+    });
+
+    let results = await TruckModel.findAll({
         where: $query
     });
-    return res.send(result);
+    return res.send({
+        totalCount,
+        results
+    });
 });
 
 router.get("/detail", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await Truck.findOne({
+        let result = await TruckModel.findOne({
             where: {
-                TRUCK_ID: id
+                id: id
             }
         });
         return res.send(result);
@@ -62,13 +54,13 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { name, licensePlate, catId } = req.body;
+    let { name, license_plate, cat_id } = req.body;
     try {
-        let result = await Truck.create({
-            TRUCK_NAME: name,
-            TRUCK_LICENSE_PLATE: licensePlate,
-            TRUCK_CAT_ID: catId,
-            TRUCK_STATUS: 1
+        let result = await TruckModel.create({
+            name: name,
+            license_plate: license_plate,
+            cat_id: cat_id,
+            status: 1
         });
         return res.send(result);
     } catch (e) {
@@ -79,26 +71,26 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { name, licensePlate, catId, status } = req.body;
+    let { name, license_plate, cat_id, status } = req.body;
     try {
-        let result = await Truck.findOne({
+        let result = await TruckModel.findOne({
             where: {
-                TRUCK_ID: id
+                id: id
             }
         });
         if (name !== undefined) {
-            result.TRUCK_NAME = name;
+            result.name = name;
         }
-        if (licensePlate !== undefined) {
-            result.TRUCK_LICENSE_PLATE = licensePlate;
+        if (license_plate !== undefined) {
+            result.license_plate = license_plate;
         }
-        if (catId !== undefined) {
-            result.TRUCK_CAT_ID = catId;
+        if (cat_id !== undefined) {
+            result.cat_id = cat_id;
         }
         if (status !== undefined) {
-            result.TRUCK_STATUS = status;
+            result.status = status;
         }
-        await result.save({});
+        await result.save();
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -108,13 +100,20 @@ router.post("/update", async (req, res) => {
 
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
+    console.log("id", id)
     try {
-        let result = await Truck.destroy({
+        let result = await TruckModel.findOne({
             where: {
-                TRUCK_ID: id
+                id: id,
             }
         });
-        return res.sendStatus(200);
+        if (result) {
+            result.is_deleted = true;
+            await result.save();
+            return res.sendStatus(200);
+        } else {
+            return res.sendStatus(404);
+        }
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);
