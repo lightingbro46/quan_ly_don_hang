@@ -8,30 +8,38 @@ module.exports = {
      */
     defineTruckModel: (sequelize, TruckCatsModel) => {
         const TruckModel = sequelize.define('TRUCKS', {
-            TRUCK_ID: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
             },
-            TRUCK_CAT_ID: {
+            cat_id: {
                 type: DataTypes.INTEGER,
                 references: {
                     model: TruckCatsModel,
-                    key: "TRUCK_CAT_ID"
+                    key: "id"
                 },
                 allowNull: false
             },
-            TRUCK_LICENSE_PLATE: {
+            name: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            TRUCK_STATUS: {
+            license_plate: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            status: {
                 type: DataTypes.TINYINT,
                 defaultValue: 1,
                 /**
                  * 1: Đang làm việc
                  * 2: Bảo dưỡng, loại bỏ
                  */
+            },
+            is_deleted: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
             },
         }, {
             timestamps: true,

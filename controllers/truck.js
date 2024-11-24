@@ -8,20 +8,26 @@ router.get("/list", async (req, res) => {
         totalCount: 2,
         results: [{
             id: 1,
+            name: "xe 1",
             licensePlate: "14uuuuuu",
             catId: 1,
             status: 1,
         },
         {
             id: 2,
+            name: "xe 1",
             licensePlate: "15uuuuuu",
             catId: 3,
             status: 2,
         },]
     });
-    const { licensePlate, catId, status } = req.query;
+    const { name, licensePlate, catId, status } = req.query;
     let $query = {};
-    
+    if (name) {
+        $query.TRUCK_NAME = {
+            [Op.like]: `%${name}%`
+        }
+    }
     if (licensePlate) {
         $query.TRUCK_LICENSE_PLATE = {
             [Op.like]: `%${licensePlate}%`
@@ -56,9 +62,10 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { licensePlate, catId } = req.body;
+    let { name, licensePlate, catId } = req.body;
     try {
         let result = await Truck.create({
+            TRUCK_NAME: name,
             TRUCK_LICENSE_PLATE: licensePlate,
             TRUCK_CAT_ID: catId,
             TRUCK_STATUS: 1
@@ -72,13 +79,16 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { licensePlate, catId, status } = req.body;
+    let { name, licensePlate, catId, status } = req.body;
     try {
         let result = await Truck.findOne({
             where: {
                 TRUCK_ID: id
             }
         });
+        if (name !== undefined) {
+            result.TRUCK_NAME = name;
+        }
         if (licensePlate !== undefined) {
             result.TRUCK_LICENSE_PLATE = licensePlate;
         }

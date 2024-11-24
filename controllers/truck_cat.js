@@ -14,11 +14,19 @@ router.get("/list", async (req, res) => {
         }
     }
 
-    let result = await TruckCatModel.findAll({
+    const totalCount = await TruckCatModel.findAll({
         where: $query,
         attributes: [["TRUCK_CAT_ID", "id"], ["TRUCK_CAT_NAME", "name"]]
     });
-    return res.send(result);
+
+    let results = await TruckCatModel.findAll({
+        where: $query,
+        attributes: [["TRUCK_CAT_ID", "id"], ["TRUCK_CAT_NAME", "name"]]
+    });
+    return res.send({
+        totalCount,
+        results
+    });
 });
 
 router.get("/detail", async (req, res) => {

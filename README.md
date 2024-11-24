@@ -1,0 +1,5 @@
+- bảng sơ đồ quan hệ sql (trước 11h trưa 24/11)
+- giao diện báo cáo (bảng báo cáo Tít chuẩn bị)
+- in hoá đơn (mẫu hoá đơn Tít chuẩn bị)
+- bảng nhân viên
+- phân quyền hiển thị (ko hiển thị báo cáo và bảng nhân viên)

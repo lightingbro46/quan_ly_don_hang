@@ -7,34 +7,38 @@ module.exports = {
      */
     defineCustomerModel: (sequelize) => {
         const CustomerModel = sequelize.define("CUSTOMERS", {
-            CUSTOMER_ID: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-            CUSTOMER_NAME: {
+            name: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            CUSTOMER_COMPANY: {
+            company: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            CUSTOMER_TAX: {
+            tax: {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
-            CUSTOMER_ADDRESS: {
+            address: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            CUSTOMER_PHONE: {
+            phone_number: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            CUSTOMER_EMAIL: {
+            email: {
                 type: DataTypes.TEXT,
                 allowNull: true
+            },
+            is_deleted: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
             },
         }, {
             timestamps: true,

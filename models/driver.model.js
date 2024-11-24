@@ -7,20 +7,20 @@ module.exports = {
      */
     defineDriverModel: (sequelize) => {
         const DriverModel = sequelize.define('DRIVERS', {
-            DRIVER_ID: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-            DRIVER_NAME: {
+            name: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            DRIVER_PHONE: {
+            phone_number: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            DRIVER_GENDER: {
+            gender: {
                 type: DataTypes.TINYINT,
                 allowNull: false
                 /**
@@ -28,13 +28,17 @@ module.exports = {
                  * 2: Nữ
                  */
             },
-            DRIVER_STATUS: {
+            status: {
                 type: DataTypes.TINYINT,
                 defaultValue: 1
                 /**
                  * 1: Đang làm việc
                  * 2: Nghỉ việc
                  */
+            },
+            is_deleted: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
             },
         }, {
             timestamps: true,

@@ -10,81 +10,92 @@ module.exports = {
      */
     defineOrderModel: (sequelize, CustomersModel, TrucksModel, DriversModel) => {
         const OrderModel = sequelize.define('ORDERS', {
-            ORDER_ID: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-            ORDER_DEPARTURE: {
+            departure: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            ORDER_ARRIVAL: {
+            arrival: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            ORDER_MATERIAL: {
+            material: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            ORDER_TOTAL_WEIGHT: {
+            weight: {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            ORDER_START_DATE: {
+            start_date: {
                 type: DataTypes.DATE,
                 allowNull: false
             },
-            ORDER_END_DATE: {
+            end_date: {
                 type: DataTypes.DATE,
                 allowNull: false
             },
-            ORDER_TRUCK_ID: {
+            truck_id: {
                 type: DataTypes.INTEGER,
                 references: {
                     model: TrucksModel,
-                    key: "TRUCK_ID"
+                    key: "truck_id"
                 }
             },
-            ORDER_DRIVER_ID: {
+            driver_id: {
                 type: DataTypes.INTEGER,
                 references: {
                     model: DriversModel,
-                    key: "DRIVER_ID"
+                    key: "driver_id"
                 }
             },
-            ORDER_CUSTOMER_ID: {
+            customer_id: {
                 type: DataTypes.INTEGER,
                 references: {
                     model: CustomersModel,
-                    key: "CUSTOMER_ID"
+                    key: "customer_id"
                 }
             },
-            ORDER_PRICING: {
+            pricing: {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
-            ORDER_COST: {
+            tolls: {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
-            ORDER_STATUS: {
-                type: DataTypes.INTEGER,
+            status: {
+                type: DataTypes.TINYINT,
                 defaultValue: 1,
                 /**
                  * 1: Đã tiếp nhận
-                 * 2: Đang vận chuyển
-                 * 3: Đã trả hàng
-                 * 4: Đã huỷ đơn
+                 * 2: Đã huỷ đơn
                  */
             },
-            ORDER_PAYMENT_STATUS: {
-                type: DataTypes.INTEGER,
+            deliver_status: {
+                type: DataTypes.TINYINT,
+                defaultValue: 1,
+                /**
+                 * 1: Chờ vận chuyển
+                 * 2: Đang vận chuyển
+                 * 3: Đã trả hàng
+                 */
+            },
+            payment_status: {
+                type: DataTypes.TINYINT,
                 defaultValue: 1,
                 /**
                  * 1: Chưa thanh toán
                  * 2: Đã thanh toán 
                  */
+            },
+            is_deleted: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
             },
         }, {
             timestamps: true,
