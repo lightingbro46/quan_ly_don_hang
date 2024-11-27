@@ -68,6 +68,8 @@ router.post("/update", async (req, res) => {
                 id: id
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         if (name !== undefined) {
             result.name = name;
         }
@@ -87,13 +89,12 @@ router.get("/delete", async (req, res) => {
                 id: id
             }
         });
-        if (result) {
-            result.is_deleted = true;
-            await result.save();
-            return res.sendStatus(200);
-        } else {
+        if (!result)
             return res.sendStatus(404);
-        }
+
+        result.is_deleted = true;
+        await result.save();
+        return res.sendStatus(200);
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);

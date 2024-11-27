@@ -4,33 +4,16 @@ const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    return res.send({
-        totalCount: 2,
-        results: [{
-            id: 1,
-            name: "Anh",
-            gender: 1,
-            phone: "101001010",
-            status: 1,
-        },
-        {
-            id: 2,
-            name: "Anhâ",
-            gender: 2,
-            phone: "1010010210",
-            status: 2,
-        },]
-    });
     const query = req.query;
     let $query = [];
     if (query.string != undefined) {
         let $query_string = {
             [Op.or]: [{
-                DRIVER_NAME: {
+                name: {
                     [Op.like]: `%${query.string}%`
                 }
             }, {
-                DRIVER_PHONE: {
+                phone_number: {
                     [Op.like]: `%${query.string}%`
                 }
             }],
@@ -39,16 +22,25 @@ router.get("/list", async (req, res) => {
     }
     if (query.status != undefined) {
         let $query_status = {
-            DRIVER_STATUS: query.status
+            status: query.status
         };
         $query.push($query_status);
     }
-    let result = await DriverModel.findAll({
+    let countTotal = await DriverModel.count({
         where: {
             [Op.and]: $query
         }
     });
-    return res.send(result);
+    let results = await DriverModel.findAll({
+        where: {
+            [Op.and]: $query,
+            is_deleted: false
+        }
+    });
+    return res.send({
+        countTotal,
+        results
+    });
 });
 
 router.get("/detail", async (req, res) => {
@@ -56,9 +48,12 @@ router.get("/detail", async (req, res) => {
     try {
         let result = await DriverModel.findOne({
             where: {
-                DRIVER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -67,13 +62,14 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { name, phone, gender } = req.body;
+    let { name, birthday, phone, gender } = req.body;
     try {
         let result = await DriverModel.create({
-            DRIVER_NAME: name,
-            DRIVER_PHONE: phone,
-            DRIVER_GENDER: gender,
-            DRIVER_STATUS: 1,
+            name: name,
+            birthday: birthday,
+            phone_number: phone,
+            gender: gender,
+            status: 1,
         });
         return res.send(result);
     } catch (e) {
@@ -84,24 +80,28 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { name, phone, gender, status } = req.body;
+    let { name, phone, birthday, gender, status } = req.body;
     try {
         let result = await DriverModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
         if (name !== undefined) {
-            result.DRIVER_NAME = name;
+            result.name = name;
+        }
+        if (birthday !== undefined) {
+            result.birthday = birthday;
         }
         if (phone !== undefined) {
-            result.DRIVER_PHONE = phone;
+            result.phone_number = phone;
         }
         if (gender !== undefined) {
-            result.DRIVER_GENDER = gender;
+            result.gender = gender;
         }
         if (status !== undefined) {
-            result.DRIVER_STATUS = status;
+            result.status = status;
         }
         await result.save();
         return res.send(result);
@@ -116,9 +116,15 @@ router.get("/delete", async (req, res) => {
     try {
         let result = await DriverModel.destroy({
             where: {
-                DRIVER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
+        if (!result) {
+            return res.sendStatus(404);
+        }
+        result.is_deleted = true;
+        await result.save();
         return res.sendStatus(200);
     } catch (e) {
         console.log(e);
@@ -128,13 +134,26 @@ router.get("/delete", async (req, res) => {
 
 router.post("/available", async (req, res) => {
     let { id } = req.query;
+    let { start_date, end_date } = req.body;
     try {
-        let result = await DriverModel.destroy({
+        let countTotal = await DriverModel.count({
             where: {
-                DRIVER_ID: id
+                id: id,
+                status: 1,
+                is_deleted: false
             }
         });
-        return res.sendStatus(200);
+        let results = await DriverModel.findAll({
+            where: {
+                id: id,
+                status: 1,
+                is_deleted: false
+            }
+        });
+        return res.send({
+            countTotal,
+            results
+        });
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);

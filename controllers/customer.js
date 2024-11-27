@@ -8,21 +8,21 @@ router.get("/list", async (req, res) => {
         totalCount: 2,
         results: [{
             id: 1,
-            name: "Anh",
-            company: "abc",
+            name: "Nguyễn Văn A",
+            company: "Công ty 1",
             tax: "111111",
-            address: "ahdhdhdhd",
-            phone: "101001010",
-            email: "aaja@gmail.com",
+            address: "Hà Nội",
+            phone: "09822828282",
+            email: "nguyenvana@gmail.com",
         },
         {
             id: 2,
-            name: "Anhâ",
-            company: "xyz",
+            name: "Nguyễn Văn B",
+            company: "Công ty 2",
             tax: "1111112",
-            address: "eeeeeee",
-            phone: "1010010210",
-            email: "eeee@gmail.com",
+            address: "Hải Phòng",
+            phone: "09727277227",
+            email: "nguyenvanb@gmail.com",
         },]
     });
     try {

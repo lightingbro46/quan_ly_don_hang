@@ -1,64 +1,40 @@
 const router = require("express").Router();
-const { CostModel, DriverTimelineModel } = require("../models");
+const { CostModel } = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    return res.send({
-        totalCount: 1,
-        data: [{
-            id: 1,
-            DRIVER_NAME: "Anh",
-            DRIVER_GENDER: 1,
-            DRIVER_PHONE: "101001010",
-            DRIVER_STATUS: 1,
-        },
-        {
-            DRIVER_ID: 2,
-            DRIVER_NAME: "Anhâ",
-            DRIVER_GENDER: 2,
-            DRIVER_PHONE: "1010010210",
-            DRIVER_STATUS: 2,
-        },]
-    });
-    const query = req.query;
-    let $query = [];
-    if (query.string != undefined) {
-        let $query_string = {
-            [Op.or]: [{
-                DRIVER_NAME: {
-                    [Op.like]: `%${query.string}%`
-                }
-            }, {
-                DRIVER_PHONE: {
-                    [Op.like]: `%${query.string}%`
-                }
-            }],
-        }
-        $query.push($query_string);
+    try {
+        let totalCount = await CostModel.count({
+            where: {
+                is_deleted: false
+            }
+        })
+        let results = await CostModel.findAll({
+            where: {
+                is_deleted: false
+            }
+        });
+        return res.send({
+            totalCount,
+            results
+        });
+    } catch (e) {
+        console.log(e);
+        return res.sendStatus(400);
     }
-    if (query.driver_status != undefined) {
-        let $query_status = {
-            DRIVER_STATUS: query.driver_status
-        };
-        $query.push($query_status);
-    }
-    let result = await DriverModel.findAll({
-        where: {
-            [Op.and]: $query
-        }
-    });
-    return res.send(result);
 });
 
 router.get("/detail", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await DriverModel.findOne({
+        let result = await CostModel.findOne({
             where: {
-                DRIVER_ID: id
+                id: id
             }
         });
+        if (!result)
+            return res.sendStatus(404)
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -67,13 +43,13 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { driver_name, driver_phone, driver_gender } = req.body;
+    let { province, arrival, pricing, tolls } = req.body;
     try {
-        let result = await DriverModel.create({
-            DRIVER_NAME: driver_name,
-            DRIVER_PHONE: driver_phone,
-            DRIVER_GENDER: driver_gender,
-            DRIVER_STATUS: 1,
+        let result = await CostModel.create({
+            province: province,
+            arrival: arrival,
+            pricing: pricing,
+            tolls: tolls,
         });
         return res.send(result);
     } catch (e) {
@@ -84,24 +60,29 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { driver_name, driver_phone, driver_gender, driver_status } = req.body;
+    let { province, arrival, pricing, tolls } = req.body;
     try {
-        let result = await Driver.findOne({
+        let result = await CostModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
-        if (driver_name !== undefined) {
-            result.DRIVER_NAME = driver_name;
+
+        if (!result)
+            return res.sendStatus(404);
+
+        if (province !== undefined) {
+            result.province = province;
         }
-        if (driver_phone !== undefined) {
-            result.DRIVER_PHONE = driver_phone;
+        if (arrival !== undefined) {
+            result.arrival = arrival;
         }
-        if (driver_gender !== undefined) {
-            result.DRIVER_GENDER = driver_gender;
+        if (pricing !== undefined) {
+            result.pricing = pricing;
         }
-        if (driver_status !== undefined) {
-            result.DRIVER_STATUS = driver_status;
+        if (tolls !== undefined) {
+            result.tolls = tolls;
         }
         await result.save();
         return res.send(result);
@@ -114,26 +95,17 @@ router.post("/update", async (req, res) => {
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await Driver.destroy({
+        let result = await CostModel.findOne({
             where: {
-                DRIVER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
-        return res.sendStatus(200);
-    } catch (e) {
-        console.log(e);
-        return res.sendStatus(400);
-    }
-});
+        if (!result)
+            return res.sendStatus(404);
 
-router.post("/available", async (req, res) => {
-    let { id } = req.query;
-    try {
-        let result = await Driver.destroy({
-            where: {
-                DRIVER_ID: id
-            }
-        });
+        result.is_deleted = true;
+        await result.save();
         return res.sendStatus(200);
     } catch (e) {
         console.log(e);

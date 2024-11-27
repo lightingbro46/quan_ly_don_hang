@@ -1,62 +1,24 @@
 const router = require("express").Router();
-const { CustomerModel, CustomersModel } = require("../models");
+const { UserModel } = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    return res.send({
-        totalCount: 2,
-        results: [{
-            id: 1,
-            name: "Anh",
-            company: "abc",
-            tax: "111111",
-            address: "ahdhdhdhd",
-            phone: "101001010",
-            email: "aaja@gmail.com",
-        },
-        {
-            id: 2,
-            name: "Anhâ",
-            company: "xyz",
-            tax: "1111112",
-            address: "eeeeeee",
-            phone: "1010010210",
-            email: "eeee@gmail.com",
-        },]
-    });
     try {
-        const query = req.query;
-        let $query = {};
-        if (query.query_string != undefined) {
-            $query = {
-                [Op.or]: [{
-                    CUSTOMER_NAME: {
-                        [Op.like]: `%${query_string}%`
-                    }
-                }, {
-                    CUSTOMER_COMPANY: {
-                        [Op.like]: `%${query_string}%`
-                    }
-                }, {
-                    CUSTOMER_ADDRESS: {
-                        [Op.like]: `%${query_string}%`
-                    }
-                }, {
-                    CUSTOMER_PHONE: {
-                        [Op.like]: `%${query_string}%`
-                    }
-                }, {
-                    CUSTOMER_EMAIL: {
-                        [Op.like]: `%${query_string}%`
-                    }
-                }],
+        let totalCount = await UserModel.count({
+            where: {
+                is_deleted: false
             }
-        }
-        let result = await Customer.findAll({
-            where: $query
         });
-        return res.send(result);
+        let result = await UserModel.findAll({
+            where: {
+                is_deleted: false
+            }
+        });
+        return res.send({
+            totalCount,
+            result
+        });
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);
@@ -64,11 +26,11 @@ router.get("/list", async (req, res) => {
 });
 
 router.get("/detail", async (req, res) => {
-    let query = req.query;
+    let { id } = req.query;
     try {
-        let result = await Customer.findOne({
+        let result = await UserModel.findOne({
             where: {
-                CUSTOMER_ID: query.id
+                id: id
             }
         });
         return res.send(result);
@@ -79,50 +41,76 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { name, company, tax, address, phone, email } = req.body;
+    let { fullname, gender, birthday, company, position, tax, address, phone_number, email, username, password } = req.body;
     try {
-        let result = await Customer.create({
-            CUSTOMER_NAME: name,
-            CUSTOMER_COMPANY: company,
-            CUSTOMER_TAX: tax,
-            CUSTOMER_ADDRESS: address,
-            CUSTOMER_PHONE: phone,
-            CUSTOMER_EMAIL: email,
+        let result = await UserModel.create({
+            fullname: fullname,
+            gender: gender,
+            birthday: birthday,
+            postionce: birthday,
+            company: company,
+            tax: tax,
+            address: address,
+            phone_number: phone_number,
+            email: email,
+            position: position,
+            start_date: start_date,
+            end_start: end_start,
+            username: username,
+            password: password,
         });
         return res.send(result);
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);
     }
-
 });
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { name, company, tax, address, phone, email } = req.body;
+    let { fullname, gender, birthday, company, position, tax, address, phone_number, email, username, password } = req.body;
     try {
-        let result = await CustomersModel.findOne({
+        let result = await UserModelsModel.findOne({
             where: {
-                CUSTOMER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
-        if (name !== undefined) {
-            result.CUSTOMER_NAME = name;
+        if (!result)
+            return res.sendStatus(404);
+
+        if (fullname !== undefined) {
+            result.fullname = fullname;
+        }
+        if (gender !== undefined) {
+            result.gender = gender;
+        }
+        if (birthday !== undefined) {
+            result.birthday = birthday;
         }
         if (company !== undefined) {
-            result.CUSTOMER_COMPANY = company;
+            result.company = company;
+        }
+        if (position !== undefined) {
+            result.position = position;
         }
         if (tax !== undefined) {
-            result.CUSTOMER_TAX = tax;
+            result.tax = tax;
         }
         if (address !== undefined) {
-            result.CUSTOMER_ADDRESS = address;
+            result.address = address;
         }
-        if (phone !== undefined) {
-            result.CUSTOMER_PHONE = phone;
+        if (phone_number !== undefined) {
+            result.phone_number = phone_number;
         }
         if (email !== undefined) {
-            result.CUSTOMER_EMAIL = email;
+            result.email = email;
+        }
+        if (username !== undefined) {
+            result.username = username;
+        }
+        if (password !== undefined) {
+            result.password = password;
         }
         await result.save();
         return res.send(result);
@@ -135,9 +123,10 @@ router.post("/update", async (req, res) => {
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await Customer.findOne({
+        let result = await UserModel.findOne({
             where: {
-                CUSTOMER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
         result.is_deleted = true;
@@ -152,10 +141,11 @@ router.get("/delete", async (req, res) => {
 router.post("/login", async (req, res) => {
     let { username, password } = req.body;
     try {
-        let result = await Customer.findOne({
+        let result = await UserModel.findOne({
             where: {
-                account: username,
-                password: password
+                username: username,
+                password: password,
+                is_deleted: false,
             }
         });
         return result ?

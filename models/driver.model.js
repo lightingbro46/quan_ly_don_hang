@@ -16,6 +16,10 @@ module.exports = {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
+            birthday: {
+                type: DataTypes.DATEONLY,
+                allowNull: false
+            },
             phone_number: {
                 type: DataTypes.TEXT,
                 allowNull: false
@@ -32,7 +36,8 @@ module.exports = {
                 type: DataTypes.TINYINT,
                 defaultValue: 1
                 /**
-                 * 1: Đang làm việc
+                 * 1: Sẵn sàng
+                 * 2: Đang vận chuyển
                  * 2: Nghỉ việc
                  */
             },

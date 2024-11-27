@@ -32,9 +32,9 @@ module.exports = {
      */
     insertTruckCatData: async (TruckCatModel) => {
         const TruckCatData = [
-            { id: 1, name: "Loại xe cont 20 tấn" },
-            { id: 2, name: "Loại xe cont 40 tấn" },
-            { id: 3, name: "Loại xe cont 45 tấn" },
+            { id: 1, name: "Loại xe cont 20" },
+            { id: 2, name: "Loại xe cont 40" },
+            { id: 3, name: "Loại xe cont 45" },
         ];
         await TruckCatModel.bulkCreate(TruckCatData, { updateOnDuplicate: ['id'] });
         console.log("Insert truck catalog success");

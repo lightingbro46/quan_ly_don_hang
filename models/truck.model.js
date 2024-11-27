@@ -33,7 +33,8 @@ module.exports = {
                 type: DataTypes.TINYINT,
                 defaultValue: 1,
                 /**
-                 * 1: Đang làm việc
+                 * 1: Sẵn sàng
+                 * 2: Đang vận chuyển
                  * 2: Bảo dưỡng, loại bỏ
                  */
             },

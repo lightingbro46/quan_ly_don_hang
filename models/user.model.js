@@ -16,50 +16,55 @@ module.exports = {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
+            password: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            fullname: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            gender: {
+                type: DataTypes.TINYINT,
+                allowNull: false
+            },
             birthday: {
-                type: DataTypes.DATE,
-                allowNull: true
+                type: DataTypes.DATEONLY,
+                allowNull: false
             },
             position: {
                 type: DataTypes.TEXT,
-                allowNull: true
+                allowNull: false
             },
             address: {
                 type: DataTypes.TEXT,
-                allowNull: true
+                allowNull: false
             },
             phone_number: {
                 type: DataTypes.TEXT,
-                allowNull: true
+                allowNull: false
             },
             start_date: {
-                type: DataTypes.DATE,
-                allowNull: true
+                type: DataTypes.DATEONLY,
+                allowNull: false
             },
             end_date: {
-                type: DataTypes.DATE,
+                type: DataTypes.DATEONLY,
                 allowNull: true
             },
             status: {
                 type: DataTypes.TINYINT,
                 defaultValue: 1
                 /**
-                 * 1: Đang làm việc
-                 * 2: Nghỉ việc
+                 * 1: Sẵn sàng
+                 * 2: Đang làm việc
+                 * 3: Nghỉ việc
                  */
             },
             is_admin: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
                 allowNull: false,
-            },
-            account: {
-                type: DataTypes.TEXT,
-                allowNull: false
-            },
-            password: {
-                type: DataTypes.TEXT,
-                allowNull: false
             },
             is_deleted: {
                 type: DataTypes.BOOLEAN,
@@ -80,16 +85,32 @@ module.exports = {
             {
                 id: 1,
                 username: "admin",
-                position: null,
-                address: null,
-                phone_number: null,
-                birthday: null,
-                start_date: null,
+                password: "123456",
+                fullname: "Nguyễn Văn A",
+                position: "Quản trị hệ thống",
+                address: "Hà Nội",
+                phone_number: "0928288228",
+                gender: 1,
+                birthday: new Date("1997-1-11"),
+                start_date: new Date("2023-10-20"),
                 end_date: null,
                 status: 1,
                 is_admin: true,
-                account: "admin",
-                password: "123456"
+            },
+            {
+                id: 2,
+                username: "user",
+                password: "123456",
+                fullname: "Nguyễn Thị B",
+                position: "Nhân viên",
+                gender: 2,
+                address: "Hải Phòng",
+                phone_number: "0928227277",
+                birthday: new Date("1997-02-15"),
+                start_date: new Date("2024-10-20"),
+                end_date: null,
+                status: 1,
+                is_admin: false,
             },
         ];
         await UserModel.bulkCreate(userData, { updateOnDuplicate: ['id'] });
