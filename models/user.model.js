@@ -56,9 +56,8 @@ module.exports = {
                 type: DataTypes.TINYINT,
                 defaultValue: 1
                 /**
-                 * 1: Sẵn sàng
-                 * 2: Đang làm việc
-                 * 3: Nghỉ việc
+                 * 1: Đang làm việc
+                 * 2: Nghỉ việc
                  */
             },
             is_admin: {
@@ -70,6 +69,10 @@ module.exports = {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+            identification: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            }
         }, {
             timestamps: true,
             tableName: "USERS"
@@ -87,7 +90,7 @@ module.exports = {
                 username: "admin",
                 password: "123456",
                 fullname: "Nguyễn Văn A",
-                position: "Quản trị hệ thống",
+                position: "Quản trị",
                 address: "Hà Nội",
                 phone_number: "0928288228",
                 gender: 1,
@@ -96,6 +99,7 @@ module.exports = {
                 end_date: null,
                 status: 1,
                 is_admin: true,
+                identification: "11111111111111"
             },
             {
                 id: 2,
@@ -111,6 +115,7 @@ module.exports = {
                 end_date: null,
                 status: 1,
                 is_admin: false,
+                identification: "22222222222222"
             },
         ];
         await UserModel.bulkCreate(userData, { updateOnDuplicate: ['id'] });

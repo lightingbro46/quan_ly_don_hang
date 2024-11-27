@@ -4,36 +4,13 @@ const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    const query = req.query;
-    let $query = [];
-    if (query.string != undefined) {
-        let $query_string = {
-            [Op.or]: [{
-                name: {
-                    [Op.like]: `%${query.string}%`
-                }
-            }, {
-                phone_number: {
-                    [Op.like]: `%${query.string}%`
-                }
-            }],
-        }
-        $query.push($query_string);
-    }
-    if (query.status != undefined) {
-        let $query_status = {
-            status: query.status
-        };
-        $query.push($query_status);
-    }
     let countTotal = await DriverModel.count({
         where: {
-            [Op.and]: $query
+            is_deleted: false
         }
     });
     let results = await DriverModel.findAll({
         where: {
-            [Op.and]: $query,
             is_deleted: false
         }
     });
@@ -62,12 +39,13 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { name, birthday, phone, gender } = req.body;
+    let { name, identification, birthday, phone_number, gender } = req.body;
     try {
         let result = await DriverModel.create({
             name: name,
+            identification: identification,
             birthday: birthday,
-            phone_number: phone,
+            phone_number: phone_number,
             gender: gender,
             status: 1,
         });
@@ -80,7 +58,7 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { name, phone, birthday, gender, status } = req.body;
+    let { name, identification, phone_number, birthday, gender, status } = req.body;
     try {
         let result = await DriverModel.findOne({
             where: {
@@ -88,14 +66,21 @@ router.post("/update", async (req, res) => {
                 is_deleted: false
             }
         });
+
+        if (!result)
+            return res.sendStatus(404);
+
         if (name !== undefined) {
             result.name = name;
+        }
+        if (identification !== undefined) {
+            result.identification = identification;
         }
         if (birthday !== undefined) {
             result.birthday = birthday;
         }
-        if (phone !== undefined) {
-            result.phone_number = phone;
+        if (phone_number !== undefined) {
+            result.phone_number = phone_number;
         }
         if (gender !== undefined) {
             result.gender = gender;
@@ -114,15 +99,15 @@ router.post("/update", async (req, res) => {
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await DriverModel.destroy({
+        let result = await DriverModel.findOne({
             where: {
                 id: id,
                 is_deleted: false
             }
         });
-        if (!result) {
+        if (!result)
             return res.sendStatus(404);
-        }
+
         result.is_deleted = true;
         await result.save();
         return res.sendStatus(200);
@@ -158,6 +143,18 @@ router.post("/available", async (req, res) => {
         console.log(e);
         return res.sendStatus(400);
     }
+});
+
+router.get("/count", async (req, res) => {
+    console.log(req.query);
+    let countTotal = await DriverModel.count({
+        where: {
+            is_deleted: false
+        }
+    });
+    return res.send({
+        countTotal
+    });
 });
 
 module.exports = router;

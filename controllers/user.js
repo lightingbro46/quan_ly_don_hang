@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const { UserModel } = require("../models");
-const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
@@ -10,14 +9,14 @@ router.get("/list", async (req, res) => {
                 is_deleted: false
             }
         });
-        let result = await UserModel.findAll({
+        let results = await UserModel.findAll({
             where: {
                 is_deleted: false
             }
         });
         return res.send({
             totalCount,
-            result
+            results
         });
     } catch (e) {
         console.log(e);
@@ -33,6 +32,8 @@ router.get("/detail", async (req, res) => {
                 id: id
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -41,23 +42,34 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let { fullname, gender, birthday, company, position, tax, address, phone_number, email, username, password } = req.body;
+    let {
+        fullname,
+        identification,
+        gender,
+        birthday,
+        position,
+        address,
+        phone_number,
+        username,
+        password,
+        is_admin,
+        start_date
+    } = req.body;
     try {
         let result = await UserModel.create({
             fullname: fullname,
+            identification: identification,
             gender: gender,
             birthday: birthday,
-            postionce: birthday,
-            company: company,
-            tax: tax,
             address: address,
             phone_number: phone_number,
-            email: email,
             position: position,
             start_date: start_date,
-            end_start: end_start,
+            end_date: null,
             username: username,
             password: password,
+            is_admin: is_admin,
+            status: 1
         });
         return res.send(result);
     } catch (e) {
@@ -68,9 +80,9 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { fullname, gender, birthday, company, position, tax, address, phone_number, email, username, password } = req.body;
+    let { fullname, identification, gender, birthday, position, address, phone_number, start_date, end_date, status, username, password } = req.body;
     try {
-        let result = await UserModelsModel.findOne({
+        let result = await UserModel.findOne({
             where: {
                 id: id,
                 is_deleted: false
@@ -82,20 +94,17 @@ router.post("/update", async (req, res) => {
         if (fullname !== undefined) {
             result.fullname = fullname;
         }
+        if (identification !== undefined) {
+            result.identification = identification;
+        }
         if (gender !== undefined) {
             result.gender = gender;
         }
         if (birthday !== undefined) {
             result.birthday = birthday;
         }
-        if (company !== undefined) {
-            result.company = company;
-        }
         if (position !== undefined) {
             result.position = position;
-        }
-        if (tax !== undefined) {
-            result.tax = tax;
         }
         if (address !== undefined) {
             result.address = address;
@@ -103,14 +112,20 @@ router.post("/update", async (req, res) => {
         if (phone_number !== undefined) {
             result.phone_number = phone_number;
         }
-        if (email !== undefined) {
-            result.email = email;
+        if (start_date !== undefined) {
+            result.start_date = start_date;
+        }
+        if (end_date !== undefined) {
+            result.end_date = end_date;
         }
         if (username !== undefined) {
             result.username = username;
         }
         if (password !== undefined) {
             result.password = password;
+        }
+        if (status !== undefined) {
+            result.status = status;
         }
         await result.save();
         return res.send(result);
@@ -129,6 +144,8 @@ router.get("/delete", async (req, res) => {
                 is_deleted: false
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         result.is_deleted = true;
         await result.save();
         return res.sendStatus(200);
@@ -145,6 +162,7 @@ router.post("/login", async (req, res) => {
             where: {
                 username: username,
                 password: password,
+                status: 1,
                 is_deleted: false,
             }
         });
@@ -156,6 +174,18 @@ router.post("/login", async (req, res) => {
         console.log(e);
         return res.sendStatus(400);
     }
+});
+
+router.get("/count", async (req, res) => {
+    console.log(req.query);
+    let totalCount = await UserModel.count({
+        where: {
+            is_deleted: false
+        }
+    });
+    return res.send({
+        countTotal
+    });
 });
 
 module.exports = router;

@@ -30,7 +30,8 @@ router.get("/detail", async (req, res) => {
     try {
         let result = await CostModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
         if (!result)

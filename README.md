@@ -14,12 +14,14 @@
 - đổi logo
 - dashboard
 
+26/11
+- dashboard -> báo cáo -> icon trạng thái vận chuyển -> làm mượt api hoạt động thêm sửa xoá cac doi tuong
+- cạp nhât đơn hàng
+- bao cao
+- dinh muc
 
-
-dashboard -> báo cáo -> icon trạng thái vận chuyển -> làm mượt api hoạt động thêm sửa xoá cac doi tuong
-
-cạp nhât đơn hàng
-
-bao cao
-
-dinh muc
+27/11
+- api
+- don hang
+- bao cao, bieu do
+- in hoa don
