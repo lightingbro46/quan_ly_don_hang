@@ -8,7 +8,7 @@ module.exports = {
      * @param {Model} DriversModel 
      * @returns 
      */
-    defineOrderModel: (sequelize, CustomersModel, TrucksModel, DriversModel) => {
+    defineOrderModel: (sequelize, CustomerModel, TruckModel, DriverModel, UserModel) => {
         const OrderModel = sequelize.define('ORDERS', {
             id: {
                 type: DataTypes.INTEGER,
@@ -42,22 +42,29 @@ module.exports = {
             truck_id: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: TrucksModel,
-                    key: "truck_id"
+                    model: TruckModel,
+                    key: "id"
                 }
             },
             driver_id: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: DriversModel,
-                    key: "driver_id"
+                    model: DriverModel,
+                    key: "id"
                 }
             },
             customer_id: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: CustomersModel,
-                    key: "customer_id"
+                    model: CustomerModel,
+                    key: "id"
+                }
+            },
+            user_id: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: UserModel,
+                    key: "id"
                 }
             },
             pricing: {

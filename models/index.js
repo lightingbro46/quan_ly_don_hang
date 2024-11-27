@@ -16,16 +16,16 @@ const sequelize = new Sequelize({
   logging: (...msg) => {/*console.log(msg)*/ },
 });
 
+const UserModel = defineUserModel(sequelize);
 const TruckCatModel = defineTruckCatModel(sequelize);
 const TruckModel = defineTruckModel(sequelize, TruckCatModel);
 const DriverModel = defineDriverModel(sequelize);
 const CustomerModel = defineCustomerModel(sequelize);
-const OrderModel = defineOrderModel(sequelize, CustomerModel, TruckModel, DriverModel);
+const OrderModel = defineOrderModel(sequelize, CustomerModel, TruckModel, DriverModel, UserModel);
 const CostModel = defineCostModel(sequelize);
-const UserModel = defineUserModel(sequelize);
 
 (async () => {
-  await sequelize.sync();
+  await sequelize.sync({ alter: true });
   await insertTruckCatData(TruckCatModel);
   await insertCostData(CostModel);
   await insertUserData(UserModel);
