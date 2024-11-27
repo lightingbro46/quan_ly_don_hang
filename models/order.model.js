@@ -80,16 +80,10 @@ module.exports = {
                 defaultValue: 1,
                 /**
                  * 1: Đã tiếp nhận
-                 * 2: Đã huỷ đơn
-                 */
-            },
-            deliver_status: {
-                type: DataTypes.TINYINT,
-                defaultValue: 1,
-                /**
-                 * 1: Chờ vận chuyển
-                 * 2: Đang vận chuyển
-                 * 3: Đã trả hàng
+                 * 2: Đang lấy hàng
+                 * 3: Đang vận chuyển
+                 * 4: Đã trả hàng
+                 * 5: Đã huỷ đơn
                  */
             },
             payment_status: {
@@ -98,6 +92,7 @@ module.exports = {
                 /**
                  * 1: Chưa thanh toán
                  * 2: Đã thanh toán 
+                 * 3: Đã hoàn tiền
                  */
             },
             is_deleted: {

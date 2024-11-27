@@ -1,100 +1,28 @@
 const router = require("express").Router();
 const { OrderModel } = require("../models/index");
-const { Op, where, DataTypes } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
-    return res.send({
-        totalCount: 1,
-        results: [{
-            id: 1,
-            departure: "abba",
-            arrival: "Ddd",
-            startDate: "12/2/2024",
-            endDate: "15/2/2024",
-            material: "Đá",
-            weight: "10",
-            truckId: 1,
-            truckLicensePlate: "14U1",
-            driverId: 2,
-            driverName: "anh",
-            customerId: 1,
-            customerName: "binh",
-            pricing: 10000000,
-            cost: 200000,
-            status: 2,
-            payment: 1
-        }]
-    })
-    const { order_id, order_start_date, order_end_date, order_customer, order_truck, order_driver, order_status } = req.query;
-    let $query = [];
-    if (order_id != undefined) {
-        let $query_string = {
-            ORDER_ID: {
-                [Op.like]: `%${order_id}%`
+    try {
+        let totalCount = await OrderModel.count({
+            where: {
+                is_deleted: false
             }
-        }
-        $query.push($query_string);
-    }
-    if (order_start_date != undefined) {
-        let $query_date = {
-            ORDER_START_DATE: {
-                [Op.gte]: order_start_date
+        });
+        let results = await OrderModel.findAll({
+            where: {
+                is_deleted: false
             }
-        }
-        $query.push($query_date);
+        });
+        return res.send({
+            totalCount,
+            results
+        });
+    } catch (e) {
+        console.log(e);
+        return res.sendStatus(400);
     }
 
-    if (order_end_date != undefined) {
-        let $query_date = {
-            ORDER_END_TIME: {
-                [Op.lte]: order_end_date
-            }
-        }
-        $query.push($query_date);
-    }
-
-    if (order_customer != undefined) {
-        let $query_string = {
-            ORDER_CUSTOMER_ID: {
-                [Op.eq]: order_customer
-            }
-        }
-        $query.push($query_string);
-    }
-
-    if (order_truck != undefined) {
-        let $query_string = {
-            ORDER_TRUCK_ID: {
-                [Op.eq]: order_truck
-            }
-        }
-        $query.push($query_string);
-    }
-
-    if (order_driver != undefined) {
-        let $query_string = {
-            ORDER_DRIVER_ID: {
-                [Op.eq]: order_driver
-            }
-        }
-        $query.push($query_string);
-    }
-
-    if (order_status != undefined) {
-        let $query_string = {
-            ORDER_STATUS: {
-                [Op.eq]: order_status
-            }
-        }
-        $query.push($query_string);
-    }
-    let result = await Driver.findAll({
-        where: {
-            [Op.and]: $query
-        }
-    });
-    return res.send(result);
 });
 
 router.get("/detail", async (req, res) => {
@@ -102,9 +30,12 @@ router.get("/detail", async (req, res) => {
     try {
         let result = await OrderModel.findOne({
             where: {
-                ORDER_ID: id
+                id: id,
+                is_deleted: false
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -114,20 +45,22 @@ router.get("/detail", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    let body = req.body;
+    let { departure, arrival, material, weight, start_date, end_date, truck_id, driver_id, customer_id, user_id, pricing, tolls, payment_status } = req.body;
     try {
         let result = await OrderModel.create({
-            ORDER_DEPARTURE: body.order_departure,
-            ORDER_ARRIVAL: body.order_arrival,
-            ORDER_MATERIAL: body.order_material,
-            ORDER_TOTAL_WEIGHT: body.order_total_weight,
-            ORDER_START_DATE: body.order_start_date,
-            ORDER_END_DATE: body.order_end_date,
-            ORDER_CUSTOMER_ID: body.order_customer,
-            ORDER_TRUCK_ID: body.order_truck,
-            ORDER_DRIVER_ID: body.order_driver,
-            ORDER_STATUS: 1,
-            ORDER_PAYMENT_STATUS: body.order_payment_status
+            departure: departure,
+            arrival: arrival,
+            material: material,
+            weight: weight,
+            start_date: start_date,
+            end_date: end_date,
+            truck_id: truck_id,
+            driver_id: driver_id,
+            customer_id: customer_id,
+            user_id: user_id,
+            pricing: pricing,
+            tolls: tolls,
+            payment_status: payment_status
         });
         return res.send(result);
     } catch (e) {
@@ -139,37 +72,59 @@ router.post("/add", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     let { id } = req.query;
-    let { code, startTime, endTime, truckId, driverId, content, status } = req.body;
+    let { departure, arrival, material, weight, start_date, end_date, truck_id, driver_id, customer_id, user_id, pricing, tolls, status, payment_status } = req.body;
     try {
         let result = await OrderModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
 
-        if (code !== undefined) {
-            result.code = code;
+        if (!result)
+            return res.sendStatus(404);
+
+        if (departure !== undefined) {
+            result.departure = departure;
         }
-        if (startTime !== undefined) {
-            result.startTime = startTime;
+        if (arrival !== undefined) {
+            result.arrival = arrival;
         }
-        if (endTime !== undefined) {
-            result.endTime = endTime;
+        if (material !== undefined) {
+            result.material = material;
         }
-        if (customerId !== undefined) {
-            result.customerId = customerId;
+        if (weight !== undefined) {
+            result.weight = weight;
         }
-        if (truckId !== undefined) {
-            result.truckId = truckId;
+        if (start_date !== undefined) {
+            result.start_date = start_date;
         }
-        if (driverId !== undefined) {
-            result.driverId = driverId;
+        if (end_date !== undefined) {
+            result.end_date = end_date;
         }
-        if (content !== undefined) {
-            result.content = content;
+        if (truck_id !== undefined) {
+            result.truck_id = truck_id;
+        }
+        if (driver_id !== undefined) {
+            result.driver_id = driver_id;
+        }
+        if (customer_id !== undefined) {
+            result.customer_id = customer_id;
+        }
+        if (user_id !== undefined) {
+            result.user_id = user_id;
+        }
+        if (pricing !== undefined) {
+            result.pricing = pricing;
+        }
+        if (tolls !== undefined) {
+            result.tolls = tolls;
         }
         if (status !== undefined) {
             result.status = status;
+        }
+        if (payment_status !== undefined) {
+            result.payment_status = payment_status;
         }
         await result.save();
         return res.send(result);
@@ -182,12 +137,17 @@ router.post("/update", async (req, res) => {
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
     try {
-        let result = await OrderModel.destroy({
+        let result = await OrderModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
-        return res.send(result);
+        if (!result)
+            return res.sendStatus(404);
+        result.is_deleted = true;
+        await result.save();
+        return res.sendStatus(200);
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);

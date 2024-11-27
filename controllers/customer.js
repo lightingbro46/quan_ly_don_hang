@@ -117,7 +117,7 @@ router.get("/delete", async (req, res) => {
         });
         if (!result)
             return res.sendStatus(404);
-        console.log(result)
+        result.is_deleted = true;
         await result.save();
         return res.sendStatus(200);
     } catch (e) {
