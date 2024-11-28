@@ -22,6 +22,7 @@ app.use("/api/drivers", require("./controllers/driver"));
 app.use("/api/customers", require("./controllers/customer"));
 app.use("/api/orders", require("./controllers/order"));
 app.use("/api/users", require("./controllers/user"));
+app.use("/api/report", require("./controllers/report"));
 
 app.listen(3000, () => {
   console.log("Service is running on port 3000");

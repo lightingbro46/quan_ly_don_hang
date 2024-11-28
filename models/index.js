@@ -13,7 +13,7 @@ const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db/database.sqlite",
   freezeTableName: true,
-  logging: (...msg) => {/*console.log(msg)*/ },
+  logging: (...msg) => { /*console.log(msg)*/ },
 });
 
 const UserModel = defineUserModel(sequelize);
@@ -25,7 +25,7 @@ const OrderModel = defineOrderModel(sequelize, CustomerModel, TruckModel, Driver
 const CostModel = defineCostModel(sequelize);
 
 (async () => {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
   await insertTruckCatData(TruckCatModel);
   await insertCostData(CostModel);
   await insertUserData(UserModel);

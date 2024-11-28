@@ -16,10 +16,6 @@ module.exports = {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            identification: {
-                type: DataTypes.TEXT,
-                allowNull: false
-            },
             company: {
                 type: DataTypes.TEXT,
                 allowNull: false

@@ -1,18 +1,30 @@
 const router = require("express").Router();
 const { CustomerModel } = require("../models");
+const { Op } = require('sequelize');
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
+    const { q } = req.query;
+    let $query = {}
+
+    if (q != undefined) {
+        $query.name = {
+            [Op.like]: `%${q}%`
+        }
+    }
+
     try {
         let totalCount = await CustomerModel.count({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             }
         });
 
         let results = await CustomerModel.findAll({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             }
         });
         return res.send({

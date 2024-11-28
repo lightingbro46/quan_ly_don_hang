@@ -154,8 +154,4 @@ router.get("/delete", async (req, res) => {
     }
 });
 
-router.post("/export", async (req, res) => {
-    return res.sendStatus(200);
-});
-
 module.exports = router;

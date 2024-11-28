@@ -4,15 +4,31 @@ const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
+    const { q } = req.query;
+    let $query = {}
+
+    if (q != undefined) {
+        $query[Op.or] = {
+            province: {
+                [Op.like]: `%${q}%`
+            },  
+            arrival: {
+                [Op.like]: `%${q}%`
+            }
+        }
+    }
+
     try {
         let totalCount = await CostModel.count({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             }
         })
         let results = await CostModel.findAll({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             }
         });
         return res.send({

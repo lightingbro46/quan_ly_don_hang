@@ -120,12 +120,23 @@ router.get("/delete", async (req, res) => {
 router.post("/available", async (req, res) => {
     let { id } = req.query;
     let { start_date, end_date } = req.body;
+    let $query = {
+        start_date: {
+            [Op.gte]: start_date
+        },
+        end_date: {
+            [Op.lte]: end_date
+        }
+    }
     try {
         let countTotal = await DriverModel.count({
             where: {
                 id: id,
-                status: 1,
-                is_deleted: false
+                status: {
+                    [Op.ne]: 3
+                },
+                is_deleted: false,
+
             }
         });
         let results = await DriverModel.findAll({
@@ -143,18 +154,6 @@ router.post("/available", async (req, res) => {
         console.log(e);
         return res.sendStatus(400);
     }
-});
-
-router.get("/count", async (req, res) => {
-    console.log(req.query);
-    let countTotal = await DriverModel.count({
-        where: {
-            is_deleted: false
-        }
-    });
-    return res.send({
-        countTotal
-    });
 });
 
 module.exports = router;

@@ -176,16 +176,4 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.get("/count", async (req, res) => {
-    console.log(req.query);
-    let totalCount = await UserModel.count({
-        where: {
-            is_deleted: false
-        }
-    });
-    return res.send({
-        countTotal
-    });
-});
-
 module.exports = router;
