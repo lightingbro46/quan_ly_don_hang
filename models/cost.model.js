@@ -7,7 +7,7 @@ module.exports = {
      * @param {Model} TruckCatsModel 
      * @returns
      */
-    defineCostModel: (sequelize, ProvincesModel, TruckCatsModel) => {
+    defineCostModel: (sequelize) => {
         const CostModel = sequelize.define('COSTS', {
             id: {
                 type: DataTypes.INTEGER,

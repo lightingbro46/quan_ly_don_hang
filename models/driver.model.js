@@ -53,6 +53,11 @@ module.exports = {
             timestamps: true,
             tableName: "DRIVERS"
         });
+
+        DriverModel.associations = ({OrderModel}) => {
+            DriverModel.hasMany(OrderModel, { foreignKey: "driver_id" });
+        }
+
         return DriverModel;
     }
 }

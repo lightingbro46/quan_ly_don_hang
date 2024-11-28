@@ -6,7 +6,7 @@ module.exports = {
      * @returns 
      */
     defineUserModel: (sequelize) => {
-        const CustomerModel = sequelize.define("USERS", {
+        const UserModel = sequelize.define("USERS", {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
@@ -77,7 +77,12 @@ module.exports = {
             timestamps: true,
             tableName: "USERS"
         });
-        return CustomerModel;
+
+        UserModel.associations = ({ OrderModel }) => {
+            UserModel.hasMany(OrderModel, { foreignKey: "user_id" });
+        }
+
+        return UserModel;
     },
     /**
      * @param {Model} UserModel 

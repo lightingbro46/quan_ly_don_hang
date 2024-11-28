@@ -44,6 +44,11 @@ module.exports = {
             timestamps: true,
             tableName: "CUSTOMERS"
         });
+
+        CustomerModel.associations = ({OrderModel}) => {
+            CustomerModel.hasMany(OrderModel, { foreignKey: "customer_id" });
+        }
+
         return CustomerModel;
     }
 }

@@ -1,13 +1,11 @@
 const router = require("express").Router();
-const { TruckModel } = require("../models");
+const { TruckModel, OrderModel } = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
     const { name, license_plate, cat_id, status } = req.query;
-    let $query = {
-        is_deleted :false
-    };
+    let $query = {};
     if (name) {
         $query.name = {
             [Op.like]: `%${name}%`
@@ -25,11 +23,17 @@ router.get("/list", async (req, res) => {
         $query.status = status;
     }
     let totalCount = await TruckModel.count({
-        where: $query,
+        where: {
+            is_deleted: false,
+            ...$query
+        },
     });
 
     let results = await TruckModel.findAll({
-        where: $query
+        where: {
+            is_deleted: false,
+            ...$query
+        },
     });
     return res.send({
         totalCount,
@@ -42,9 +46,12 @@ router.get("/detail", async (req, res) => {
     try {
         let result = await TruckModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
+        if (!result)
+            return res.sendStatus(404);
         return res.send(result);
     } catch (e) {
         console.log(e);
@@ -75,9 +82,14 @@ router.post("/update", async (req, res) => {
     try {
         let result = await TruckModel.findOne({
             where: {
-                id: id
+                id: id,
+                is_deleted: false
             }
         });
+
+        if (!result)
+            return res.sendStatus(404);
+
         if (name !== undefined) {
             result.name = name;
         }
@@ -100,20 +112,128 @@ router.post("/update", async (req, res) => {
 
 router.get("/delete", async (req, res) => {
     let { id } = req.query;
-    console.log("id", id)
     try {
         let result = await TruckModel.findOne({
             where: {
                 id: id,
+                is_deleted: false
             }
         });
-        if (result) {
-            result.is_deleted = true;
-            await result.save();
-            return res.sendStatus(200);
-        } else {
+        if (!result)
             return res.sendStatus(404);
-        }
+        result.is_deleted = true;
+        await result.save();
+        return res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        return res.sendStatus(400);
+    }
+});
+
+router.post("/available", async (req, res) => {
+    console.log(req.body)
+    let { start_date, end_date, cat_id, q } = req.body;
+    if (!start_date || !end_date || !cat_id)
+        return res.sendStatus(400);
+
+    let $query = {}
+    if (q != undefined) {
+        $query[Op.or] = [
+            {
+                name: {
+                    [Op.like]: `%${q}%`
+                }
+            },
+            {
+                license_plate: {
+                    [Op.like]: `%${q}%`
+                },
+
+            }
+        ]
+    }
+    if (cat_id != undefined) {
+        $query.cat_id = cat_id;
+    }
+
+    try {
+        let countTotal = await TruckModel.count({
+            where: {
+                status: 1,
+                is_deleted: false,
+                "$ORDERS.id$": null,
+                ...$query
+            },
+            include: [
+                {
+                    model: OrderModel,
+                    required: false,
+                    where: {
+                        [Op.or]: [
+                            {
+                                start_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                end_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                start_date: {
+                                    [Op.lte]: start_date,
+                                },
+                                end_date: {
+                                    [Op.gte]: end_date,
+                                },
+                            }
+                        ]
+                    }
+                }
+            ]
+        });
+        let results = await TruckModel.findAll({
+            where: {
+                status: 1,
+                is_deleted: false,
+                "$ORDERS.id$": null,
+                ...$query
+            },
+            attributes: ["id", "name", "license_plate"],
+            include: [
+                {
+                    model: OrderModel,
+                    required: false,
+                    where: {
+                        [Op.or]: [
+                            {
+                                start_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                end_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                start_date: {
+                                    [Op.lte]: start_date,
+                                },
+                                end_date: {
+                                    [Op.gte]: end_date,
+                                },
+                            }
+                        ]
+                    }
+                }
+            ]
+        });
+        return res.send({
+            countTotal,
+            results
+        });
     } catch (e) {
         console.log(e);
         return res.sendStatus(400);

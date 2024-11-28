@@ -3,10 +3,9 @@ const { DataTypes, Sequelize, Model } = require('sequelize');
 module.exports = {
     /**
      * @param {Sequelize} sequelize 
-     * @param {Model} TruckCatsModel 
      * @returns
      */
-    defineTruckModel: (sequelize, TruckCatsModel) => {
+    defineTruckModel: (sequelize) => {
         const TruckModel = sequelize.define('TRUCKS', {
             id: {
                 type: DataTypes.INTEGER,
@@ -15,10 +14,6 @@ module.exports = {
             },
             cat_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: TruckCatsModel,
-                    key: "id"
-                },
                 allowNull: false
             },
             name: {
@@ -46,6 +41,12 @@ module.exports = {
             timestamps: true,
             tableName: "TRUCKS"
         });
+
+        TruckModel.associations = ({ OrderModel, TruckCatModel }) => {
+            TruckModel.hasMany(OrderModel, { foreignKey: "truck_id" });
+            TruckModel.belongsTo(TruckCatModel, { foreignKey: "cat_id" });
+        }
+
         return TruckModel;
     }
 }

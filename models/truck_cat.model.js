@@ -24,6 +24,11 @@ module.exports = {
             timestamps: true,
             tableName: "TRUCK_CATS"
         });
+
+        TrunkCatModel.associations = ({ TruckModel }) => {
+            TrunkCatModel.hasMany(TruckModel, { foreignKey: "cat_id"});
+        }
+
         return TrunkCatModel;
     },
     /**

@@ -8,6 +8,7 @@ const { defineTruckCatModel, insertTruckCatData } = require("./truck_cat.model")
 const { defineTruckModel } = require("./truck.model");
 const { defineUserModel, insertUserData } = require("./user.model");
 
+const db = { Sequelize };
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -15,14 +16,36 @@ const sequelize = new Sequelize({
   freezeTableName: true,
   logging: (...msg) => { /*console.log(msg)*/ },
 });
+db.sequelize = sequelize;
 
 const UserModel = defineUserModel(sequelize);
+db.UserModel = UserModel;
+
 const TruckCatModel = defineTruckCatModel(sequelize);
-const TruckModel = defineTruckModel(sequelize, TruckCatModel);
+db.TruckCatModel = TruckCatModel;
+
+const TruckModel = defineTruckModel(sequelize);
+db.TruckModel = TruckModel;
+
 const DriverModel = defineDriverModel(sequelize);
+db.DriverModel = DriverModel;
+
 const CustomerModel = defineCustomerModel(sequelize);
-const OrderModel = defineOrderModel(sequelize, CustomerModel, TruckModel, DriverModel, UserModel);
+db.CustomerModel = CustomerModel;
+
+const OrderModel = defineOrderModel(sequelize);
+db.OrderModel = OrderModel;
+
 const CostModel = defineCostModel(sequelize);
+db.CostModel = CostModel;
+
+
+UserModel.associations(db);
+TruckCatModel.associations(db);
+TruckModel.associations(db);
+DriverModel.associations(db);
+CustomerModel.associations(db);
+OrderModel.associations(db);
 
 (async () => {
   await sequelize.sync();

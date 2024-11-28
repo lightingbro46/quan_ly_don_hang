@@ -3,12 +3,9 @@ const { DataTypes, Sequelize } = require('sequelize');
 module.exports = {
     /**
      * @param {Sequelize} sequelize 
-     * @param {Model} CustomersModel 
-     * @param {Model} TrucksModel 
-     * @param {Model} DriversModel 
      * @returns 
      */
-    defineOrderModel: (sequelize, CustomerModel, TruckModel, DriverModel, UserModel) => {
+    defineOrderModel: (sequelize) => {
         const OrderModel = sequelize.define('ORDERS', {
             id: {
                 type: DataTypes.INTEGER,
@@ -41,31 +38,19 @@ module.exports = {
             },
             truck_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: TruckModel,
-                    key: "id"
-                }
+                allowNull: false
             },
             driver_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: DriverModel,
-                    key: "id"
-                }
+                allowNull: false
             },
             customer_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: CustomerModel,
-                    key: "id"
-                }
+                allowNull: false
             },
             user_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: UserModel,
-                    key: "id"
-                }
+                allowNull: false
             },
             pricing: {
                 type: DataTypes.INTEGER,
@@ -103,6 +88,14 @@ module.exports = {
             timestamps: true,
             tableName: "ORDERS"
         });
+
+
+        OrderModel.associations = ({ CustomerModel, TruckModel, DriverModel, UserModel }) => {
+            OrderModel.belongsTo(CustomerModel, { foreignKey: "customer_id" });
+            OrderModel.belongsTo(TruckModel, { foreignKey: "truck_id" });
+            OrderModel.belongsTo(DriverModel, { foreignKey: "driver_id" });
+            OrderModel.belongsTo(UserModel, { foreignKey: "user_id" });
+        }
 
         return OrderModel;
     }

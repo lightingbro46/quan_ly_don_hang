@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { DriverModel, DriverTimelineModel } = require("../models");
+const { DriverModel, DriverTimelineModel, OrderModel } = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/list", async (req, res) => {
@@ -118,33 +118,90 @@ router.get("/delete", async (req, res) => {
 });
 
 router.post("/available", async (req, res) => {
-    let { id } = req.query;
-    let { start_date, end_date } = req.body;
-    let $query = {
-        start_date: {
-            [Op.gte]: start_date
-        },
-        end_date: {
-            [Op.lte]: end_date
+    let { start_date, end_date, q } = req.body;
+    if (!start_date || !end_date)
+        return res.sendStatus(400);
+
+    let $query = {}
+    if (q != undefined) {
+        $query.name = {
+            [Op.like]: `%${q}%`
         }
     }
+
     try {
         let countTotal = await DriverModel.count({
             where: {
-                id: id,
                 status: {
                     [Op.ne]: 3
                 },
                 is_deleted: false,
-
-            }
+            },
+            include: [
+                {
+                    model: OrderModel,
+                    required: false,
+                    where: {
+                        [Op.or]: [
+                            {
+                                start_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                end_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                start_date: {
+                                    [Op.lte]: start_date,
+                                },
+                                end_date: {
+                                    [Op.gte]: end_date,
+                                },
+                            }
+                        ]
+                    }
+                }
+            ]
         });
         let results = await DriverModel.findAll({
             where: {
-                id: id,
                 status: 1,
-                is_deleted: false
-            }
+                is_deleted: false,
+                "$ORDERS.id$": null,
+                ...$query
+            },
+            attributes: ["id", "name"],
+            include: [
+                {
+                    model: OrderModel,
+                    required: false,
+                    where: {
+                        [Op.or]: [
+                            {
+                                start_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                end_date: {
+                                    [Op.between]: [start_date, end_date],
+                                }
+                            },
+                            {
+                                start_date: {
+                                    [Op.lte]: start_date,
+                                },
+                                end_date: {
+                                    [Op.gte]: end_date,
+                                },
+                            }
+                        ]
+                    }
+                }
+            ]
         });
         return res.send({
             countTotal,

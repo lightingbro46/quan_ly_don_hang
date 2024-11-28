@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const { OrderModel } = require("../models/index");
+const driverModel = require("../models/driver.model");
+const { OrderModel, DriverModel, TruckModel, UserModel } = require("../models/index");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
@@ -12,8 +13,19 @@ router.get("/list", async (req, res) => {
         let results = await OrderModel.findAll({
             where: {
                 is_deleted: false
-            }
+            },
+            include: [
+                {
+                    model: DriverModel,
+                    attributes: ["name"]
+                },
+                {
+                    model: TruckModel,
+                    attributes: ["name", "license_plate"]
+                },
+            ]
         });
+
         return res.send({
             totalCount,
             results
@@ -32,7 +44,19 @@ router.get("/detail", async (req, res) => {
             where: {
                 id: id,
                 is_deleted: false
-            }
+            },
+            include: [
+                {
+                    model: DriverModel,
+                    as: "driver",
+                    attributes: ["name"]
+                },
+                {
+                    model: TruckModel,
+                    as: "truck",
+                    attributes: ["license_plate"]
+                }
+            ]
         });
         if (!result)
             return res.sendStatus(404);
