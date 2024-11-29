@@ -55,7 +55,7 @@ module.exports = {
         });
 
         DriverModel.associations = ({OrderModel}) => {
-            DriverModel.hasMany(OrderModel, { foreignKey: "driver_id" });
+            DriverModel.hasMany(OrderModel, { foreignKey: "driver_id", as:"orders" });
         }
 
         return DriverModel;

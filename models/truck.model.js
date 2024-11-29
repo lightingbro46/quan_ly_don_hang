@@ -43,8 +43,8 @@ module.exports = {
         });
 
         TruckModel.associations = ({ OrderModel, TruckCatModel }) => {
-            TruckModel.hasMany(OrderModel, { foreignKey: "truck_id" });
-            TruckModel.belongsTo(TruckCatModel, { foreignKey: "cat_id" });
+            TruckModel.hasMany(OrderModel, { foreignKey: "truck_id", as: "orders" });
+            TruckModel.belongsTo(TruckCatModel, { foreignKey: "cat_id", as: "truck_cat" });
         }
 
         return TruckModel;

@@ -26,7 +26,7 @@ module.exports = {
         });
 
         TrunkCatModel.associations = ({ TruckModel }) => {
-            TrunkCatModel.hasMany(TruckModel, { foreignKey: "cat_id"});
+            TrunkCatModel.hasMany(TruckModel, { foreignKey: "cat_id", as: "trucks"});
         }
 
         return TrunkCatModel;

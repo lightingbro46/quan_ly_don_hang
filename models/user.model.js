@@ -79,7 +79,7 @@ module.exports = {
         });
 
         UserModel.associations = ({ OrderModel }) => {
-            UserModel.hasMany(OrderModel, { foreignKey: "user_id" });
+            UserModel.hasMany(OrderModel, { foreignKey: "user_id", as: "orders" });
         }
 
         return UserModel;

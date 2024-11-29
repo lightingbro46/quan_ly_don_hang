@@ -91,10 +91,10 @@ module.exports = {
 
 
         OrderModel.associations = ({ CustomerModel, TruckModel, DriverModel, UserModel }) => {
-            OrderModel.belongsTo(CustomerModel, { foreignKey: "customer_id" });
-            OrderModel.belongsTo(TruckModel, { foreignKey: "truck_id" });
-            OrderModel.belongsTo(DriverModel, { foreignKey: "driver_id" });
-            OrderModel.belongsTo(UserModel, { foreignKey: "user_id" });
+            OrderModel.belongsTo(CustomerModel, { foreignKey: "customer_id", as: "customer" });
+            OrderModel.belongsTo(TruckModel, { foreignKey: "truck_id", as: "truck" });
+            OrderModel.belongsTo(DriverModel, { foreignKey: "driver_id", as: "driver" });
+            OrderModel.belongsTo(UserModel, { foreignKey: "user_id", as: "user" });
         }
 
         return OrderModel;

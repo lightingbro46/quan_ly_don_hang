@@ -46,7 +46,7 @@ module.exports = {
         });
 
         CustomerModel.associations = ({OrderModel}) => {
-            CustomerModel.hasMany(OrderModel, { foreignKey: "customer_id" });
+            CustomerModel.hasMany(OrderModel, { foreignKey: "customer_id", as:"orders" });
         }
 
         return CustomerModel;

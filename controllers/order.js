@@ -17,13 +17,16 @@ router.get("/list", async (req, res) => {
             include: [
                 {
                     model: DriverModel,
+                    as: "driver",
                     attributes: ["name"]
                 },
                 {
                     model: TruckModel,
+                    as: "truck",
                     attributes: ["name", "license_plate"]
                 },
-            ]
+            ],
+            raw: true
         });
 
         return res.send({

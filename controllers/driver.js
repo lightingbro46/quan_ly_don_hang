@@ -142,6 +142,10 @@ router.post("/available", async (req, res) => {
                     model: OrderModel,
                     required: false,
                     where: {
+                        is_deleted: false,
+                        status: {
+                            [Op.ne]: 5
+                        },
                         [Op.or]: [
                             {
                                 start_date: {
@@ -173,12 +177,16 @@ router.post("/available", async (req, res) => {
                 "$ORDERS.id$": null,
                 ...$query
             },
-            attributes: ["id", "name"],
+            attributes: ["id", "name", "phone_number"],
             include: [
                 {
                     model: OrderModel,
                     required: false,
                     where: {
+                        is_deleted: false,
+                        status: {
+                            [Op.ne]: 5
+                        },
                         [Op.or]: [
                             {
                                 start_date: {
