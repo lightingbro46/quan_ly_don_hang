@@ -42,7 +42,7 @@ module.exports = {
                 /**
                  * 1: Sẵn sàng
                  * 2: Đang vận chuyển
-                 * 2: Nghỉ việc
+                 * 3: Nghỉ việc
                  */
             },
             is_deleted: {
