@@ -167,6 +167,7 @@ router.post("/available", async (req, res) => {
             include: [
                 {
                     model: OrderModel,
+                    as:"orders",
                     required: false,
                     where: {
                         is_deleted: false,
@@ -208,6 +209,7 @@ router.post("/available", async (req, res) => {
             include: [
                 {
                     model: OrderModel,
+                    as:"orders",
                     required: false,
                     where: {
                         is_deleted: false,

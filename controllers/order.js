@@ -1,18 +1,50 @@
 const router = require("express").Router();
 const driverModel = require("../models/driver.model");
-const { OrderModel, DriverModel, TruckModel, UserModel } = require("../models/index");
+const { OrderModel, DriverModel, TruckModel, UserModel, CustomerModel } = require("../models/index");
 
 router.get("/list", async (req, res) => {
     console.log(req.query);
+    const { driver_id, truck_id, start_date, end_date } = req.query;
+    let $query = {}
+    if (driver_id != undefined) {
+        $query["driver_id"] = driver_id;
+    }
+    if (truck_id != undefined) {
+        $query["truck_id"] = truck_id;
+    }
+    if (start_date != undefined && end_date != undefined) {
+        $query[Op.or] = [
+            {
+                start_date: {
+                    [Op.between]: [start_date, end_date],
+                }
+            },
+            {
+                end_date: {
+                    [Op.between]: [start_date, end_date],
+                }
+            },
+            {
+                start_date: {
+                    [Op.lte]: start_date,
+                },
+                end_date: {
+                    [Op.gte]: end_date,
+                },
+            }
+        ]
+    }
     try {
         let totalCount = await OrderModel.count({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             }
         });
         let results = await OrderModel.findAll({
             where: {
-                is_deleted: false
+                is_deleted: false,
+                ...$query
             },
             include: [
                 {
@@ -24,6 +56,11 @@ router.get("/list", async (req, res) => {
                     model: TruckModel,
                     as: "truck",
                     attributes: ["name", "license_plate"]
+                },
+                {
+                    model: CustomerModel,
+                    as: "customer",
+                    attributes: ["name"]
                 },
             ],
             raw: true
@@ -58,8 +95,14 @@ router.get("/detail", async (req, res) => {
                     model: TruckModel,
                     as: "truck",
                     attributes: ["license_plate"]
-                }
-            ]
+                },
+                {
+                    model: CustomerModel,
+                    as: "customer",
+                    attributes: ["name"]
+                },
+            ],
+            raw: true
         });
         if (!result)
             return res.sendStatus(404);
