@@ -85,26 +85,16 @@ router.get("/revenue", async (req, res) => {
                 },
                 {
                     id: 2,
-                    key: "Các khoản giảm trừ doanh thu",
-                    value: 0
-                },
-                {
-                    id: 3,
-                    key: "Giá vốn hàng bán",
-                    value: cost
-                },
-                {
-                    id: 4,
                     key: "Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
                     value: profits
                 },
                 {
-                    id: 5,
+                    id: 3,
                     key: "Thuế thu nhập doanh nghiệp",
                     value: tax
                 },
                 {
-                    id: 6,
+                    id: 4,
                     key: "Lợi nhuận sau thuế thu nhập doanh nghiệp",
                     value: profitsAfterTax
                 },
