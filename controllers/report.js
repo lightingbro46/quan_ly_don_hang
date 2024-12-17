@@ -76,8 +76,15 @@ router.get("/revenue", async (req, res) => {
         profits = revenue - cost;
         tax = profits * 20 / 100;
         profitsAfterTax = profits - tax;
-        return res.send(
-            [
+        return res.send({
+            data: {
+                revenue,
+                cost,
+                profits,
+                tax,
+                profitsAfterTax
+            },
+            report: [
                 {
                     id: 1,
                     key: "Doanh thu bán hàng và cung cấp dịch vụ",
@@ -97,8 +104,10 @@ router.get("/revenue", async (req, res) => {
                     id: 4,
                     key: "Lợi nhuận sau thuế thu nhập doanh nghiệp",
                     value: profitsAfterTax
-                },
+                }
             ]
+        }
+
         );
     } catch (e) {
         console.log(e);
